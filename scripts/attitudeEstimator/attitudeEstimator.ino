@@ -14,6 +14,9 @@ L3G gyro;
 
 #define TWA_FAST_MODE 400000
 
+int timer = 0;
+int t = 0;
+
 void setup() {
       delay(1000);
 
@@ -35,59 +38,93 @@ void setup() {
     gyro.read();
 
     gyro.writeReg(L3G::CTRL_REG1, 0xDF);
+
+    t = micros();
     
 }
 
 void loop() {
-    // updateFilter();
-    // BLA::Matrix<7> X = ekf.getState();
+    
+     updateFilter();
+     BLA::Matrix<7> X = ekf.getState();
 
-    float loopDuration;
+     if (timer > 15000) {
 
-    for (int i = 0; i < 5000; i++) {
-        uint64_t t_start = micros();
+       int dataPoints = 13;
+       Serial.write(0x01); // Open the message
+       Serial.write(0x18); // Set message type to data
+       Serial.write(dataPoints); // Send length of data packet
+       Serial.write(0x40); // Open data
+  
+       for (int i = 0; i < 6; i++) {
+          if (i == 2) {
+            writeFloat(1.0);
+          } else {
+            writeFloat(0.0);
+          }
+       }
+  
+       for (int i = 0; i < 4; i++) {
+          writeFloat(X(i));
+       }
 
-        byte ctrReg = gyro.readReg(L3G::STATUS);
+       for (int i = 0; i < 6; i++) {
+          writeFloat(0.0);
+       }
+  
+       Serial.write(0x41);
+       Serial.write(0x04);
 
-        int x_ready = (ctrReg & 0x01) >> 0;
-        int y_ready = (ctrReg & 0x02) >> 1;
-        int z_ready = (ctrReg & 0x04) >> 2;
+        timer = 0;
 
-        if (x_ready & y_ready & z_ready) {
-            Serial.print(1); Serial.print(" ");
-            gyro.read();
+     } else {
+        timer += micros() - t;
+        t = micros();
+     }
+     
+//    float loopDuration;
+//    for (int i = 0; i < 5000; i++) {
+//        uint64_t t_start = micros();
+//
+//        byte ctrReg = gyro.readReg(L3G::STATUS);
+//
+//        int x_ready = (ctrReg & 0x01) >> 0;
+//        int y_ready = (ctrReg & 0x02) >> 1;
+//        int z_ready = (ctrReg & 0x04) >> 2;
+//
+//        if (x_ready & y_ready & z_ready) {
+//            Serial.print(1); Serial.print(" ");
+//            gyro.read();
+//
+//            Serial.print((float)gyro.g.x / 114.0); Serial.print(" ");
+//            Serial.print((float)gyro.g.y / 114.0); Serial.print(" ");
+//            Serial.print((float)gyro.g.z / 114.0); Serial.print(" ");
+//
+//        } else {
+//            Serial.print(0); Serial.print(" ");
+//        }
+//
+//        // Serial.print(ctrReg); Serial.print(" ");
+//
+//        // printBits(ctrReg); Serial.print(" ");
+//        // printBits(ctrReg2); Serial.print(" ");
+//
+//        // Serial.print(x_ready); Serial.print(" ");
+//        // Serial.print(y_ready); Serial.print(" ");
+//        // Serial.print(z_ready); Serial.print(" ");
+//
+//        uint64_t t_end = micros();
+//        float dt = (float)t_end - (float)t_start;
+//        loopDuration += dt;
+//
+//
+////        Serial.println(dt);
+//        // Serial.println();
+//    }
 
-            Serial.print((float)gyro.g.x / 114.0); Serial.print(" ");
-            Serial.print((float)gyro.g.y / 114.0); Serial.print(" ");
-            Serial.print((float)gyro.g.z / 114.0); Serial.print(" ");
+//    loopDuration /= 5000;
 
-        } else {
-            Serial.print(0); Serial.print(" ");
-        }
-
-        // Serial.print(ctrReg); Serial.print(" ");
-
-        // printBits(ctrReg); Serial.print(" ");
-        // printBits(ctrReg2); Serial.print(" ");
-
-        // Serial.print(x_ready); Serial.print(" ");
-        // Serial.print(y_ready); Serial.print(" ");
-        // Serial.print(z_ready); Serial.print(" ");
-
-        uint64_t t_end = micros();
-        float dt = (float)t_end - (float)t_start;
-        loopDuration += dt;
-
-
-        Serial.println(dt);
-        // Serial.println();
-    }
-
-    loopDuration /= 5000;
-
-    Serial.println(loopDuration);
-
-    while(1);
+//    Serial.println(loopDuration);
 
     // if (ekf.getCycleCount() % 100 == 0) {
     //     Serial << X;
@@ -99,9 +136,25 @@ void loop() {
     //     while(1);
     // }
 
+    
+
+}
+
+void writeFloat(float val) {
+  union {
+    float fval;
+    byte b[4];
+  } data;
+  data.fval = val;
+  for (int i = 0; i < 4; i++) {
+    Serial.write(data.b[i]);
+  }
 }
 
 void updateFilter() {
+
+    gyro.read();
+    compacc.read();
 
     Vec3 w_m(gyro.g.x, gyro.g.y, gyro.g.z);
     Vec3 a_m(compacc.a.x, compacc.a.y, compacc.a.z);
