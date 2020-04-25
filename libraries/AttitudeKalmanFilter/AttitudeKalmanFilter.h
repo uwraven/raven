@@ -4,20 +4,19 @@
 #include <BasicLinearAlgebra.h>
 #include <BasicLinearAlgebraOptimized.h>
 #include <Quaternion.h>
-#include <Vec3.h>
 #include <Utility.h>
+#include <Vec3.h>
 
 class AttitudeKalmanFilter {
-public:
-
-    AttitudeKalmanFilter();     // Constructor
-    bool init();                // Initialization method to be called once
+   public:
+    AttitudeKalmanFilter();  // Constructor
+    bool init();             // Initialization method to be called once
 
     // Gain initialization methods
     void setQGains();
     void setRGains();
     void setInitialErrorCovariance(BLA::Matrix<7> covariance);
-    
+
     // Set initial state estimate
     void setInitialState(BLA::Matrix<7> state);
 
@@ -35,15 +34,15 @@ public:
 
     float getAverageCycleDuration();
 
-private:
-    BLA::Matrix<7>                          _Xk;     // Attitude state [q bias]
-    BLA::Matrix<7,7,Diagonal<7, float>>     _Qk;    // Q gains
-    BLA::Matrix<4,4,Diagonal<4, float>>     _Rk;    // R gains
-    BLA::Matrix<7,4>                        _K;     // Kalman gains
-    BLA::Matrix<7,7>                        _Pk;    // Error covariance
-    BLA::Matrix<7,7>                        _Ja;    // Process jacobian
-    BLA::Matrix<4,7>                        _Jh;    // Measurement jacobian
-    BLA::Matrix<7>                          _Inn;   // Innovation
+   private:
+    BLA::Matrix<7> _Xk;                         // Attitude state [q bias]
+    BLA::Matrix<7, 7, Diagonal<7, float>> _Qk;  // Q gains
+    BLA::Matrix<4, 4, Diagonal<4, float>> _Rk;  // R gains
+    BLA::Matrix<7, 4> _K;                       // Kalman gains
+    BLA::Matrix<7, 7> _Pk;                      // Error covariance
+    BLA::Matrix<7, 7> _Ja;                      // Process jacobian
+    BLA::Matrix<4, 7> _Jh;                      // Measurement jacobian
+    BLA::Matrix<7> _Inn;                        // Innovation
 
     // Timing control
     uint64_t cycleCount;
@@ -70,7 +69,6 @@ private:
     void updateProcessJacobian();
     void predictState();
     void correctState();
-
 };
 
 #endif

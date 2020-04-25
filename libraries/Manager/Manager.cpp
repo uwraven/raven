@@ -1,13 +1,10 @@
 #include "Manager.h"
 
-Manager::Manager()
-{
+Manager::Manager() {
 }
 
-void Manager::init()
-{
+void Manager::init() {
 }
 
-void Manager::main()
-{
+void Manager::main() {
 }

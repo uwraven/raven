@@ -3,9 +3,8 @@
 // #include <Allocator.h>
 // #include <Monitor.h>
 
-class FlightController
-{
-public:
+class FlightController {
+   public:
     FlightController();
 
     bool init();
@@ -17,5 +16,5 @@ public:
     // Allocator allocator;
     // Monitor monitor;
 
-private:
+   private:
 };

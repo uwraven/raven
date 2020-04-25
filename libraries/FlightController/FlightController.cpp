@@ -1,18 +1,14 @@
 #include "FlightController.h"
 
-FlightController::FlightController()
-{
+FlightController::FlightController() {
     // constructor
 }
 
-bool FlightController::init()
-{
+bool FlightController::init() {
 }
 
-bool FlightController::calibrate()
-{
+bool FlightController::calibrate() {
 }
 
-void FlightController::main()
-{
+void FlightController::main() {
 }

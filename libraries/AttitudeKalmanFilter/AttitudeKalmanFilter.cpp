@@ -2,8 +2,8 @@
 #include <BasicLinearAlgebra.h>
 #include <BasicLinearAlgebraOptimized.h>
 #include <Quaternion.h>
-#include <Vec3.h>
 #include <Utility.h>
+#include <Vec3.h>
 
 AttitudeKalmanFilter::AttitudeKalmanFilter() {
     // Constructor
@@ -14,8 +14,8 @@ AttitudeKalmanFilter::AttitudeKalmanFilter() {
 bool AttitudeKalmanFilter::init() {
     nominalDeltaT = 500e-6;
 
-    _Qk.delegate = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-    _Rk.delegate = { 1.0, 1.0, 1.0, 1.0 };
+    _Qk.delegate = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+    _Rk.delegate = {1.0, 1.0, 1.0, 1.0};
     _Qk *= nominalDeltaT;
     _Rk *= nominalDeltaT;
 
@@ -23,7 +23,7 @@ bool AttitudeKalmanFilter::init() {
         _Pk(i, i) = 100.0 * nominalDeltaT;
     }
 
-    _Xk.delegate = { 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+    _Xk.delegate = {1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
 }
 
 // Main loop method
@@ -45,7 +45,6 @@ void AttitudeKalmanFilter::main(Vec3 w_m, Vec3 a_m, float yaw) {
     // Check if filter is converged
     // TODO :: Filter convergence algorithm
     // Use filter innovation and covariance derivatives to determine convergence
-
 }
 
 void AttitudeKalmanFilter::updateEstimate() {
@@ -58,14 +57,13 @@ void AttitudeKalmanFilter::updateEstimate() {
     // 6) Use the Kalman gains to compute an innovation matrix and correct the state prediction made in (2)
     // 7) Use the current error covariances, Kalman gains, and measurement jacobian to calculate updated error covariances
 
-    updateProcessJacobian();                                        // (1) Update Ja
-    predictState();                                                 // (2) Predict _Xk
-    _Pk = _Ja * (_Pk * (~_Ja)) + _Qk;                               // (3) Intermediate _Pk
-    updateMeasurementJacobian();                                    // (4) Update Jh
-    _K = (_Pk * (~_Jh)) * (_Jh * (_Pk * (~_Jh)) + _Rk).Inverse();   // (5) Compute _K
-    correctState();                                                 // (6) Correct _Xk
-    _Pk = _Pk - _K * (_Jh * _Pk);                                   // (7) Compute new _Pk
-
+    updateProcessJacobian();                                       // (1) Update Ja
+    predictState();                                                // (2) Predict _Xk
+    _Pk = _Ja * (_Pk * (~_Ja)) + _Qk;                              // (3) Intermediate _Pk
+    updateMeasurementJacobian();                                   // (4) Update Jh
+    _K = (_Pk * (~_Jh)) * (_Jh * (_Pk * (~_Jh)) + _Rk).Inverse();  // (5) Compute _K
+    correctState();                                                // (6) Correct _Xk
+    _Pk = _Pk - _K * (_Jh * _Pk);                                  // (7) Compute new _Pk
 }
 
 void AttitudeKalmanFilter::updateInternalClock() {
@@ -73,11 +71,13 @@ void AttitudeKalmanFilter::updateInternalClock() {
 
     // Get the change in time since beginning of last loop
     cycleElapsedTime = currentCycleTime - lastCycleTime;
-    if (lastCycleTime == 0) { cycleElapsedTime = 0; };
+    if (lastCycleTime == 0) {
+        cycleElapsedTime = 0;
+    };
 
     // Add cycle to total cycle count
-    cycleCount ++;
-    
+    cycleCount++;
+
     // Compute the new cycle duration average
     averageCycleDuration = averageCycleDuration + ((float)cycleElapsedTime - averageCycleDuration) / (float)cycleCount;
 
@@ -103,40 +103,40 @@ void AttitudeKalmanFilter::updateProcessJacobian() {
     float t6 = q.x * (1.0 / 2.0);
     float t7 = q.y * (1.0 / 2.0);
     float t8 = q.z * (1.0 / 2.0);
-    _Ja(0,1) = t3;
-    _Ja(0,2) = t5;
-    _Ja(0,3) = t4;
-    _Ja(0,4) = t6;
-    _Ja(0,5) = t7;
-    _Ja(0,6) = t8;
-    _Ja(1,0) = t2;
-    _Ja(1,2) = t1;
-    _Ja(1,3) = t5;
-    _Ja(1,4) = q.w * (-1.0 / 2.0);
-    _Ja(1,5) = t8;
-    _Ja(1,6) = -t7;
-    _Ja(2,0) = t0;
-    _Ja(2,1) = t4;
-    _Ja(2,3) = t2;
-    _Ja(2,4) = -t8;
-    _Ja(2,5) = q.w * (-1.0 / 2.0);
-    _Ja(2,6) = t6;
-    _Ja(3,0) = t1;
-    _Ja(3,1) = t0;
-    _Ja(3,2) = t3;
-    _Ja(3,4) = t7;
-    _Ja(3,5) = -t6;
-    _Ja(3,6) = q.w * (-1.0 / 2.0);
-    _Ja(4,4) = 1.0;
-    _Ja(5,5) = 1.0;
-    _Ja(6,6) = 1.0;
+    _Ja(0, 1) = t3;
+    _Ja(0, 2) = t5;
+    _Ja(0, 3) = t4;
+    _Ja(0, 4) = t6;
+    _Ja(0, 5) = t7;
+    _Ja(0, 6) = t8;
+    _Ja(1, 0) = t2;
+    _Ja(1, 2) = t1;
+    _Ja(1, 3) = t5;
+    _Ja(1, 4) = q.w * (-1.0 / 2.0);
+    _Ja(1, 5) = t8;
+    _Ja(1, 6) = -t7;
+    _Ja(2, 0) = t0;
+    _Ja(2, 1) = t4;
+    _Ja(2, 3) = t2;
+    _Ja(2, 4) = -t8;
+    _Ja(2, 5) = q.w * (-1.0 / 2.0);
+    _Ja(2, 6) = t6;
+    _Ja(3, 0) = t1;
+    _Ja(3, 1) = t0;
+    _Ja(3, 2) = t3;
+    _Ja(3, 4) = t7;
+    _Ja(3, 5) = -t6;
+    _Ja(3, 6) = q.w * (-1.0 / 2.0);
+    _Ja(4, 4) = 1.0;
+    _Ja(5, 5) = 1.0;
+    _Ja(6, 6) = 1.0;
 }
 
 void AttitudeKalmanFilter::updateMeasurementJacobian() {
     // Get updated quaternion estimate
     Quaternion q(_Xk(0), _Xk(1), _Xk(2), _Xk(3));
 
-    float t0 = (q.y * q.y) * 2.0 + (q.z * q.z) * 2.0-1.0;
+    float t0 = (q.y * q.y) * 2.0 + (q.z * q.z) * 2.0 - 1.0;
     float t1 = 1.0 / ((q.w * q.w) * (q.z * q.z) * 4.0 + (q.x * q.x) * (q.y * q.y) * 4.0 + t0 * t0 + q.w * q.x * q.y * q.z * 8.0);
     float t2 = q.w * q.z * 2.0 + q.x * q.y * 2.0;
     float t3 = a_ref.z * q.z * 2.0;
@@ -146,22 +146,22 @@ void AttitudeKalmanFilter::updateMeasurementJacobian() {
     float t7 = 1.0 / t5;
     float t8 = a_ref.z * q.w * 2.0;
     float t9 = a_ref.z * q.y * 2.0;
-    _Jh(0,0) = -t9;
-    _Jh(0,1) = t3;
-    _Jh(0,2) = -t8;
-    _Jh(0,3) = t4;
-    _Jh(1,0) = t4;
-    _Jh(1,1) = t8;
-    _Jh(1,2) = t3;
-    _Jh(1,3) = t9;
-    _Jh(2,0) = t8;
-    _Jh(2,1) = -t4;
-    _Jh(2,2) = -t9;
-    _Jh(2,3) = t3;
-    _Jh(3,0) = t0 * t1 * q.z * -2.0;
-    _Jh(3,1) = t0 * t1 * q.y * -2.0;
-    _Jh(3,2) = -t1 * t7 * (t6 * q.x * 2.0-t2 * t5 * q.y * 4.0);
-    _Jh(3,3) = -t1 * t7 * (t6 * q.w * 2.0-t2 * t5 * q.z * 4.0);
+    _Jh(0, 0) = -t9;
+    _Jh(0, 1) = t3;
+    _Jh(0, 2) = -t8;
+    _Jh(0, 3) = t4;
+    _Jh(1, 0) = t4;
+    _Jh(1, 1) = t8;
+    _Jh(1, 2) = t3;
+    _Jh(1, 3) = t9;
+    _Jh(2, 0) = t8;
+    _Jh(2, 1) = -t4;
+    _Jh(2, 2) = -t9;
+    _Jh(2, 3) = t3;
+    _Jh(3, 0) = t0 * t1 * q.z * -2.0;
+    _Jh(3, 1) = t0 * t1 * q.y * -2.0;
+    _Jh(3, 2) = -t1 * t7 * (t6 * q.x * 2.0 - t2 * t5 * q.y * 4.0);
+    _Jh(3, 3) = -t1 * t7 * (t6 * q.w * 2.0 - t2 * t5 * q.z * 4.0);
 }
 
 void AttitudeKalmanFilter::predictState() {
@@ -183,7 +183,7 @@ void AttitudeKalmanFilter::predictState() {
 void AttitudeKalmanFilter::correctState() {
     // Get most recent attitude estimate
     Quaternion q(_Xk(0), _Xk(1), _Xk(2), _Xk(3));
-    
+
     // Rotate the global reference vector to the local frame
     Vec3 a_ref_local = a_ref.reverseRotateBy(q);
 
@@ -200,8 +200,7 @@ void AttitudeKalmanFilter::correctState() {
         amu.x - a_ref_local.x,
         amu.y - a_ref_local.y,
         amu.z - a_ref_local.z,
-        angleErr(yaw_m * DEG2RAD, yaw)
-    };
+        angleErr(yaw_m * DEG2RAD, yaw)};
 
     // Update the innovation matrix from error between measurements and estimations
     _Inn = _K * Err;

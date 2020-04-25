@@ -1,15 +1,14 @@
 #include "Arduino.h"
 
-class FlightLink
-{
-public:
+class FlightLink {
+   public:
     FlightLink();
 
     bool init();
 
     void writeOutput(Serial stream);
 
-private:
+   private:
     int bufferLength = 60;
     float outputBuffer[bufferLength];
     int lastIndex;
