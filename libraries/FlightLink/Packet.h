@@ -2,7 +2,7 @@
 
 class Packet {
   public:
-    Packet();
+    Packet(MessageType header, byte length);
     MessageType header;
     byte length;
     enum MessageType: byte {
@@ -12,6 +12,11 @@ class Packet {
         DC4 = 0x20,
         ACK = 0x06
     };
-  private:
-    
+    int size;
+    float buffer[248];
+
+    bool pushData(float data[]);
+    bool pushFloat(float val);
+
+    void clearBuffer();
 }

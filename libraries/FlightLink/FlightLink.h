@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#inlcude "Packet.h"
 
 class FlightLink {
    public:
@@ -7,9 +8,14 @@ class FlightLink {
     bool init();
 
     void writeOutput(Serial stream);
+    void sendPacket(Serial* stream, Packet* packet);
+    bool receivePacket(Serial* stream, Packet* packet);
 
    private:
-    int bufferLength = 60;
-    float outputBuffer[bufferLength];
+    bool malFormed;
+    int dataSize;
+    int counter;
+    bool validPacket;
+    byte dataBuffer[4];
     int lastIndex;
 };
